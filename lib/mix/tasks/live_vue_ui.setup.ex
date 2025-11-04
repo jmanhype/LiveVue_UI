@@ -18,8 +18,9 @@ defmodule Mix.Tasks.LiveVueUi.Setup do
   use Mix.Task
   
   @requirements ["app.config"]
-  
+
   @impl Mix.Task
+  @spec run(list()) :: :ok
   def run(_args) do
     if Mix.Project.umbrella?() do
       Mix.raise "mix live_vue_ui.setup can only be run inside an application directory"
@@ -55,12 +56,15 @@ defmodule Mix.Tasks.LiveVueUi.Setup do
         </.modal>
     
     Don't forget to import the components in your LiveView modules:
-    
+
         import LiveVueUI.Components
-    
+
     """)
+
+    :ok
   end
-  
+
+  @spec install_npm_packages() :: {Collectable.t(), exit_status :: non_neg_integer()}
   defp install_npm_packages do
     Mix.shell().info([:green, "* Installing ", :reset, "npm packages"])
     
@@ -74,7 +78,8 @@ defmodule Mix.Tasks.LiveVueUi.Setup do
       "@reka-ui/alert-dialog@^0.5.0"
     ], stderr_to_stdout: true)
   end
-  
+
+  @spec update_vue_app() :: :ok
   defp update_vue_app do
     Mix.shell().info([:green, "* Updating ", :reset, "Vue app"])
     
@@ -83,21 +88,36 @@ defmodule Mix.Tasks.LiveVueUi.Setup do
     
     # Update the main Vue app file to use LiveVue UI
     update_main_vue_file()
+
+    :ok
   end
-  
+
+  @spec create_setup_file() :: :ok
   defp create_setup_file do
     setup_content = """
     // LiveVue UI setup
-    import { setupLiveVueUI } from './live_vue_ui';
-    
+    // Import components from the main LiveVue UI package
+    import { Button, Modal } from 'live_vue_ui';
+
+    /**
+     * Register LiveVue UI components with your Vue app
+     * Call this function in your main Vue app setup
+     */
     export function setupLiveVueUI(app) {
-      setupLiveVueUI(app);
+      // Register components globally
+      app.component('LiveVueUIButton', Button);
+      app.component('LiveVueUIModal', Modal);
+
+      // You can add more component registrations here as the library grows
     }
     """
-    
+
     File.write!("assets/vue/live_vue_ui.js", setup_content)
+
+    :ok
   end
-  
+
+  @spec update_main_vue_file() :: :ok
   defp update_main_vue_file do
     main_vue_file = "assets/vue/index.js"
     
@@ -127,5 +147,7 @@ defmodule Mix.Tasks.LiveVueUi.Setup do
       Mix.shell().error([:red, "* ", :reset, "Could not find #{main_vue_file}"])
       Mix.shell().error([:yellow, "* ", :reset, "Please manually update your Vue app to use LiveVue UI"])
     end
+
+    :ok
   end
 end 

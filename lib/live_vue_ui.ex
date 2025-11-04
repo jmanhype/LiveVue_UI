@@ -15,24 +15,26 @@ defmodule LiveVueUI do
   
   @doc """
   Convenience function that returns a list of components for use in Phoenix LiveView templates.
-  
+
   ## Example
-  
+
       import LiveVueUI
-      
+
       def mount(_params, _session, socket) do
         {:ok, assign(socket, components: LiveVueUI.components())}
       end
   """
+  @spec components() :: list()
   def components do
     [
       # Add components as they are implemented
     ]
   end
-  
+
   @doc """
   Get the path to the LiveVueUI JavaScript assets for Vite configuration.
   """
+  @spec assets_path() :: String.t()
   def assets_path do
     Path.join(Application.app_dir(:live_vue_ui), "priv/static/live_vue_ui")
   end
